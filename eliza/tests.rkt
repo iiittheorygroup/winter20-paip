@@ -54,3 +54,12 @@
 (check-equal? (position 'a '(a b c) 1 1) 0)
 (check-equal? (position 'a '(a b c) 2 1) 0)
 (check-equal? (position 'z '(a b c) 1 1) 0)
+
+(check-equal? (segment-match '((?* ?Y) apples are liked by (?* ?X))
+                             '(apples are liked by Ryuk)
+                             '((t . t)))
+              '((?X Ryuk) (?Y)))
+(check-equal? (segment-match '((?* ?X) are not liked by Ryuk)
+                             '(apples are liked by Ryuk)
+                             '((t . t)))
+              '())

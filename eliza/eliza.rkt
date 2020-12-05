@@ -9,7 +9,8 @@
          variable?
          segment-variable?
          segment-pattern?
-         position)
+         position
+         segment-match)
 
 ; select random element from list l
 (define (random-elt l)
@@ -117,7 +118,7 @@
          (position e t s (+ c 1))))]))
 
 ; if matching binding already exsist for var, return bindings as it is. If it
-; doesn't exist and it and return new binding
+; doesn't exist extend binding to include it
 (define (match-variable var input bindings)
   (let ([binding (get-binding var bindings)])
     (cond [(not binding) (extend-bindings var input bindings)]

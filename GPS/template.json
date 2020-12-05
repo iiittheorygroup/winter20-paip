@@ -1,0 +1,12 @@
+{
+    "start": [],
+    "finish": [],
+    "ops": [
+        {
+            "action": ,
+            "preconds": [],
+            "add": [],
+            "delete": []
+        },
+	]
+}

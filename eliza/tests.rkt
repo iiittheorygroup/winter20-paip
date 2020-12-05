@@ -10,3 +10,7 @@
               '(a (b c) d (e (f))))
 (check-equal? (sublis '((a . u) (x . y)) '(a (b c) d (e (f))))
               '(u (b c) d (e (f))))
+
+(check-equal? (simple-equal? 'a 'a) #t)
+(check-equal? (simple-equal? 'eval 'apply) #f)
+(check-equal? (simple-equal? '(eval) '(apply)) #f)

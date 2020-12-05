@@ -103,7 +103,7 @@
   '((((?* ?x) hello (?* ?y))
      (How do you do. Please state your problem))
     (((?* ?x) i want (?* ?y))
-     (Why do you want ?y)
+     (Why do you want ?y ?)
      (Suppose you got ?y soon))
     (((?* ?x) if (?* ?y))
      (Do you really  think its likely that ?y)

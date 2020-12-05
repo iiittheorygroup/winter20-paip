@@ -1,7 +1,8 @@
 #lang racket
 
 (provide sublis
-         simple-equal?)
+         simple-equal?
+         get-binding)
 
 ; select random element from list l
 (define (random-elt l)

@@ -14,3 +14,6 @@
 (check-equal? (simple-equal? 'a 'a) #t)
 (check-equal? (simple-equal? 'eval 'apply) #f)
 (check-equal? (simple-equal? '(eval) '(apply)) #f)
+
+(check-equal? (get-binding 'a '((a . z) (f . u))) '(a . z))
+(check-equal? (get-binding 'b '((a . z) (f . u))) #f)

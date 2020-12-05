@@ -163,5 +163,5 @@
          eliza-rules))
 
 (define (switch-viewpoint words)
-  (sublis '((I . you) (you . I) (me . you) (am . are))
+  (sublis '((i . you) (you . i) (me . you) (am . are))
           words))

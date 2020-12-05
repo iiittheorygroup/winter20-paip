@@ -35,7 +35,7 @@ def achieve_all(states, ops, goals, goal_stack):
 
 
 def achieve(states, ops, goal, goal_stack):
-    debug(len(goal_stack), "Achieving: %s" % goal)
+    debug(len(goal_stack), f"Achieving: {goal}")
 
     if goal in states:
         return states
@@ -52,13 +52,13 @@ def achieve(states, ops, goal, goal_stack):
 
 
 def apply_op(op, states, ops, goal, goal_stack):
-    debug(len(goal_stack), "Consider: %s" % op["action"])
+    debug(len(goal_stack), f"Consider: {op['action']}")
 
     result = achieve_all(states, ops, op["preconds"], [goal] + goal_stack)
     if not result:
         return None
 
-    debug(len(goal_stack), "Action: %s" % op["action"])
+    debug(len(goal_stack), f"Action: {op['action']}")
 
     add_list = op["add"]
     del_list = op["delete"]
@@ -76,5 +76,5 @@ def main():
         print(action)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

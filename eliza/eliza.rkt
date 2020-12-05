@@ -1,5 +1,7 @@
 #lang racket
 
+(provide sublis)
+
 ; select random element from list l
 (define (random-elt l)
   (list-ref l (random (length l))))

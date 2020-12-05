@@ -49,3 +49,8 @@
 (check-equal? (segment-pattern? '(not a segment pattern)) #f)
 (check-equal? (segment-pattern? '((?* ?x) foo bar)) #t)
 (check-equal? (segment-pattern? '(?x foo bar)) #f)
+
+(check-equal? (position 'a '(a b c) 0 1) 1)
+(check-equal? (position 'a '(a b c) 1 1) 0)
+(check-equal? (position 'a '(a b c) 2 1) 0)
+(check-equal? (position 'z '(a b c) 1 1) 0)

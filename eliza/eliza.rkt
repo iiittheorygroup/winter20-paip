@@ -8,7 +8,8 @@
          pat-match
          variable?
          segment-variable?
-         segment-pattern?)
+         segment-pattern?
+         position)
 
 ; select random element from list l
 (define (random-elt l)

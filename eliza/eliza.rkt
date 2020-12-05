@@ -34,7 +34,7 @@
                                                     (pat-match (car pattern)
                                                                (car input)
                                                                bindings))]
-    [else error "Bad pattern/input"]))
+    [else (error "Bad pattern/input")]))
 
 (define (variable? x)
   (and (symbol? x) (eq? (string-ref (symbol->string x) 0) #\?)))
@@ -82,3 +82,40 @@
     (cond [(not binding) (extend-bindings var input bindings)]
           [(equal? input (binding-val binding)) bindings]
           [else fail])))
+
+; rule = '(pattern response-1 respose-2 ... response-3)
+(define (rule-pattern rule) (first rule))
+(define (rule-responses rule) (rest rule))
+
+(define eliza-rules
+  '((((?* ?x) hello (?* ?y))
+     (How do you do. Please state your problem))
+    (((?* ?x) I want (?* ?y))
+     (Why do you want ?y)
+     (Suppose you got ?y soon))
+    (((?* ?x) if (?* ?y))
+     (Do you really  think its likely that ?y)
+     (Do you wish that ?y)
+     (What do you think about ?y)
+     (Really-- if ?y))
+    (((?* ?x) no (?* ?y))
+     (Why not?)
+     (You are being a bit negative)
+     (Are you saying no just to be negative?))
+    (((?* ?x) I was (?* ?y))
+     (Were you really?)
+     (Perhaps I already knew you were ?y)
+     (Why do you tell me you were ?y now?))
+    (((?* ?x) I feel (?* ?y))
+     (Do you often feel ?y ?))
+    (((?* ?x) I felt (?* ?y))
+     (What other feelings do you have?))))
+
+(define (sublis al tree)
+  (cond
+    [(cons? tree)
+     (cons (sublis al (car tree)) (sublis al (cdr tree)))]
+    [(symbol? tree)
+     (let ([p (assoc tree al)])
+       (if p (cdr p) tree))]
+    [else tree]))

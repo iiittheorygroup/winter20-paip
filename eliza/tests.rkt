@@ -27,3 +27,12 @@
               '((a . z) (a . z) (f . u)))
 (check-equal? (extend-bindings 'b 'z '((a . z) (f . u)))
               '((b . z) (a . z) (f . u)))
+
+(check-equal? (pat-match '(i love lisp) '(i hate lisp) fail) '())
+(check-equal? (pat-match '(i love lisp) '(i hate lisp)) '())
+(check-equal? (pat-match '() '(i hate lisp)) '((t . t)))
+(check-equal? (pat-match '(i love lisp) '(i hate lisp)) '())
+(check-equal? (pat-match '(?X loves ?Y) '(Bharath loves lisp))
+              '((?Y . lisp) (?X . Bharath)))
+(check-equal? (pat-match '((?* ?X) loves ?Y) '(Bharath really loves lisp))
+              '((?Y .  lisp) (?X .  (Bharath really))))

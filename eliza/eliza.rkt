@@ -4,7 +4,8 @@
          simple-equal?
          get-binding
          binding-val
-         extend-bindings)
+         extend-bindings
+         pat-match)
 
 ; select random element from list l
 (define (random-elt l)

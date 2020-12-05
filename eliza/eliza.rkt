@@ -63,7 +63,7 @@
                                                (take input (- pos 1))
                                                bindings))])
             (if (equal? b2 fail)
-              (segment-match pattern input bindings (+ pos 1))
+              (segment-match pattern input bindings (+ start 1))
               b2)))))))
 
 ; return position of element e in list l after skipping s occurrences

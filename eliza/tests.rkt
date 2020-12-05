@@ -36,3 +36,12 @@
               '((?Y . lisp) (?X . Bharath)))
 (check-equal? (pat-match '((?* ?X) loves ?Y) '(Bharath really loves lisp))
               '((?Y .  lisp) (?X .  (Bharath really))))
+
+(check-equal? (variable? '?X) #t)
+(check-equal? (variable? 'X) #f)
+(check-equal? (variable? '?foo) #t)
+(check-equal? (variable? 'foo) #f)
+
+(check-equal? (segment-variable? '(?* ?X)) #t)
+(check-equal? (segment-variable? '?X) #f)
+(check-equal? (segment-variable? 'foo) #f)

@@ -5,7 +5,9 @@
          get-binding
          binding-val
          extend-bindings
-         pat-match)
+         pat-match
+         variable?
+         segment-variable?)
 
 ; select random element from list l
 (define (random-elt l)

@@ -7,7 +7,8 @@
          extend-bindings
          pat-match
          variable?
-         segment-variable?)
+         segment-variable?
+         segment-pattern?)
 
 ; select random element from list l
 (define (random-elt l)

@@ -45,3 +45,7 @@
 (check-equal? (segment-variable? '(?* ?X)) #t)
 (check-equal? (segment-variable? '?X) #f)
 (check-equal? (segment-variable? 'foo) #f)
+
+(check-equal? (segment-pattern? '(not a segment pattern)) #f)
+(check-equal? (segment-pattern? '((?* ?x) foo bar)) #t)
+(check-equal? (segment-pattern? '(?x foo bar)) #f)

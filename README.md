@@ -5,9 +5,9 @@ the book *Paradigms of Artificial Intelligence Programming* by Peter Norvig.
 
 ## eliza
 
-ELIZA is an early natural language processing computer program that uses pattern
-matching and substitution to give an illusion of understanding. Here is a run of
-eliza (on [latest commit](https://github.com/iiittheorygroup/winter20-paip/tree/459f7427cf4aab85d945bd1e8c8c9256d8816e72))
+[ELIZA](https://en.wikipedia.org/wiki/ELIZA) is an early natural language
+processing computer program that uses pattern matching and substitution to give
+an illusion of understanding. Here is a run of eliza (on [latest commit](https://github.com/iiittheorygroup/winter20-paip/tree/459f7427cf4aab85d945bd1e8c8c9256d8816e72))
 
 ```
 > (eliza '(hello eliza))

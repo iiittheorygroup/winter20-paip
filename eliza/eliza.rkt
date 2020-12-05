@@ -1,5 +1,17 @@
 #lang racket
 
+(define (random-elt l)
+  (list-ref l (random (length l))))
+
+(define (sublis al tree)
+  (cond
+    [(cons? tree)
+     (cons (sublis al (car tree)) (sublis al (cdr tree)))]
+    [(symbol? tree)
+     (let ([p (assoc tree al)])
+       (if p (cdr p) tree))]
+    [else tree]))
+
 (define (simple-equal? x y)
   (if (or (symbol? x) (symbol? y))
     (eq? x y)
@@ -47,7 +59,7 @@
        (variable? (cadr x))))
 
 (define (segment-pattern? p)
-  (segment-variable? (car p)))
+  (and (list? p) (segment-variable? (car p))))
 
 (define (segment-match pattern input bindings [start 0])
   (let ([var (second (first pattern))]
@@ -90,7 +102,7 @@
 (define eliza-rules
   '((((?* ?x) hello (?* ?y))
      (How do you do. Please state your problem))
-    (((?* ?x) I want (?* ?y))
+    (((?* ?x) i want (?* ?y))
      (Why do you want ?y)
      (Suppose you got ?y soon))
     (((?* ?x) if (?* ?y))
@@ -102,20 +114,24 @@
      (Why not?)
      (You are being a bit negative)
      (Are you saying no just to be negative?))
-    (((?* ?x) I was (?* ?y))
+    (((?* ?x) i was (?* ?y))
      (Were you really?)
-     (Perhaps I already knew you were ?y)
+     (Perhaps i already knew you were ?y)
      (Why do you tell me you were ?y now?))
-    (((?* ?x) I feel (?* ?y))
+    (((?* ?x) i feel (?* ?y))
      (Do you often feel ?y ?))
-    (((?* ?x) I felt (?* ?y))
+    (((?* ?x) i felt (?* ?y))
      (What other feelings do you have?))))
 
-(define (sublis al tree)
-  (cond
-    [(cons? tree)
-     (cons (sublis al (car tree)) (sublis al (cdr tree)))]
-    [(symbol? tree)
-     (let ([p (assoc tree al)])
-       (if p (cdr p) tree))]
-    [else tree]))
+(define (eliza input)
+  (ormap (lambda (rule)
+           (let ([result (pat-match (rule-pattern rule) input)])
+             (if (not (equal? result fail))
+               (flatten (sublis (switch-viewpoint result)
+                       (random-elt (rule-responses rule))))
+               #f)))
+         eliza-rules))
+
+(define (switch-viewpoint words)
+  (sublis '((I . you) (you . I) (me . you) (am . are))
+          words))

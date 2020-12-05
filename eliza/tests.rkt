@@ -17,3 +17,10 @@
 
 (check-equal? (get-binding 'a '((a . z) (f . u))) '(a . z))
 (check-equal? (get-binding 'b '((a . z) (f . u))) #f)
+
+(check-equal? (binding-val '(a . z)) 'z)
+(check-equal? (binding-val '(b . y)) 'y)
+
+(check-equal? (extend-bindings '(a . y) '((a . z) (f . u))) '((a . y) (a . z) (f . u)))
+(check-equal? (extend-bindings '(a . z) '((a . z) (f . u))) '((a . z) (a . z) (f . u)))
+(check-equal? (extend-bindings '(b . z) '((a . z) (f . u))) '((b . z) (a . z) (f . u)))

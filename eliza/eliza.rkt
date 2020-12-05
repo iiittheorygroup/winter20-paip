@@ -2,7 +2,9 @@
 
 (provide sublis
          simple-equal?
-         get-binding)
+         get-binding
+         binding-val
+         extend-bindings)
 
 ; select random element from list l
 (define (random-elt l)
@@ -36,10 +38,6 @@
 ; get value for the pair binding
 (define (binding-val binding)
   (cdr binding))
-
-; get value for the key var in the association list bindings
-(define (lookup var bindings)
-  (binding-val (get-binding var bindings)))
 
 ; add new key value pair to the association list
 (define (extend-bindings var val bindings)

@@ -46,7 +46,7 @@
                                                     (pat-match (car pattern)
                                                                (car input)
                                                                bindings))]
-    [else (error "Bad pattern/input")]))
+    [else fail]))
 
 (define (variable? x)
   (and (symbol? x) (eq? (string-ref (symbol->string x) 0) #\?)))

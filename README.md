@@ -10,6 +10,7 @@ the book *Paradigms of Artificial Intelligence Programming* by Peter Norvig.
  Here's a run of GPS for the school problem:
 
 ```bash
+python gps.py school.json
 > Do you want to output a stack trace?[y/n] n
 Executing look up number
 Executing telephone shop
@@ -18,6 +19,10 @@ Executing give shop money
 Executing shop installs battery
 Executing drive son to school
 ```
+
+### How-To use the template:
+
+1. Refer to [this file](GPS/gps.rkt) for understanding how to formulate a problem (if possible) for the GPS, and checkout [this example](GPS/monkaay.rkt) for specifics.
 
 Here's a link to the original [GPS paper](http://bitsavers.informatik.uni-stuttgart.de/pdf/rand/ipl/P-1584_Report_On_A_General_Problem-Solving_Program_Feb59.pdf).
 

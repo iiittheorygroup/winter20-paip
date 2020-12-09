@@ -20,9 +20,9 @@ Executing shop installs battery
 Executing drive son to school
 ```
 
-### How-To use the template:
+### How-To use the [Template](GPS/template.json):
 
-1. Refer to [this file](GPS/gps.rkt) for understanding how to formulate a problem (if possible) for the GPS, and checkout [this example](GPS/monkaay.rkt) for specifics.
+1. Refer to [this file](GPS/gps.rkt) for understanding how to formulate a problem (if possible) for the GPS, and checkout [this example](GPS/monkaay.json) for specifics.
 
 Here's a link to the original [GPS paper](http://bitsavers.informatik.uni-stuttgart.de/pdf/rand/ipl/P-1584_Report_On_A_General_Problem-Solving_Program_Feb59.pdf).
 

@@ -132,8 +132,11 @@
 (define (match-not patterns input bindings)
   (if (match-or patterns input bindings) fail bindings))
 
-(define (match-if patterns input bindings)
-  #f)
+(define (match-if pattern input bindings)
+  (and (eval
+         `(let ,(map (lambda (x) (list (car x) (cdr x))) bindings)
+            ,(second (first pattern)))) ; SLICK!
+       (pmatch (rest pattern) input bindings)))
 
 ; select random element from list l
 (define (random-elt l)
@@ -228,3 +231,5 @@
       ((?+   . segment-match) . ,segment-match+)
       ((??   . segment-match) . ,segment-match?)
       ((?if  . segment-match) . ,match-if))))
+
+(let ((?z  7) (?y  4) (?op  +) (?x  3)) (simple-equal? (?op ?x ?y) ?z))

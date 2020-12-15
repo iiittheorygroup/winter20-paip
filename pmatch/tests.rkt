@@ -27,3 +27,10 @@
 (check-equal? (pmatch '(a (?* ?x) (?* ?y) d) '(a b c d))'((?y b c) (?x)))
 (check-equal? (pmatch '(a (?* ?x) (?* ?y) ?x ?y) '(a b c d (b c) (d)))
               '((?y d) ((?x) b c)))
+
+(check-equal? (pmatch '(?x ?op ?y is ?z (?if (equal? (?op ?x ?y) ?z)))
+                      '(3 + 4 is 7))
+              '((?z . 7) (?y . 4) (?op . +) (?x . 3)))
+(check-equal? (pmatch '(?x ?op ?y (?if (?op ?x ?y))) '(3 > 4)) #f)
+(check-equal? (pmatch '(?x ?op ?y (?if (?op ?x ?y))) '(4 > 3))
+              '((?y . 3) (?op . >) (?x . 4)))

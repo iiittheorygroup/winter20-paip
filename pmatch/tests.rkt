@@ -1,7 +1,7 @@
 #lang racket
 
 (require rackunit)
-(require "./pmatcher.rkt")
+(require "./pmatch.rkt")
 
 ; Make sure table is set up properly
 (check-equal? (hash-ref match-table '(?is  . single-match)) 'match-is)

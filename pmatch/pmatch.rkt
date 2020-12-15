@@ -2,7 +2,17 @@
 
 (provide match-table
          segment-match-fn
-         single-match-fn)
+         single-match-fn
+         segment-match
+         match-is
+         match-or
+         match-and
+         match-not
+         segment-match
+         segment-match?
+         segment-match+
+         match-if
+         pmatch)
 
 ; Grammar for the pattern matcher
 ; pat ::= var         (match any one expression)
@@ -24,17 +34,6 @@
 ; var ::= ?char       (a symbol starting with ?)
 ; constant ::= symbol (any non variable symbol)
 
-(define match-table
-  (make-hash
-    '(((?is  . single-match)  . match-is)
-      ((?or  . single-match)  . match-or)
-      ((?and . single-match)  . match-and)
-      ((?not . single-match)  . match-not)
-      ((?*   . segment-match) . segment-match)
-      ((?+   . segment-match) . segment-match+)
-      ((??   . segment-match) . segment-match?)
-      ((?if  . segment-match) . match-if))))
-
 (define (segment-match-fn x)
   (when (symbol? x) (hash-ref match-table (cons x 'segment-match))))
 
@@ -50,8 +49,91 @@
        (segment-match-fn (caar p))))
 
 ; single-patterns are of the form '(?is x predicate), '(?and . patterns)
+; HACK : Leaky abstraction! Relies on the fact that match-table is a hashmap
 (define (single-pattern? p)
-  (and (cons? p) (single-match-fn (car p))))
+  (and (cons? p) (hash-has-key? match-table (car p)) (single-match-fn (car p))))
+
+(define (segment-matcher pattern input bindings)
+  (apply (segment-match-fn (caar pattern)) (list pattern input bindings)))
+
+(define (segment-match pattern input bindings [start 0])
+  (let ([var (cadar pattern)]
+        [pat (rest pattern)])
+    (if (null? pat)
+      (match-variable var input bindings)
+      (let ([pos (first-match-pos (first pat) input start)])
+        (if (null? pos)
+          fail
+          (let ([b2 (pmatch pat
+                            (drop input pos)
+                            (match-variable var (take input pos) bindings))])
+            (if (eq? b2 fail)
+              (segment-match pattern input bindings (+ pos 1))
+              b2)))))))
+
+(define (first-match-pos pat input start)
+  (cond
+    [(and (symbol? pat) (not (variable? pat)))
+     (position pat input start 0)]
+    [(< start (length input)) start]
+    [else null]))
+
+; return position of element e in list l after skipping s occurrences
+; c = current position in list
+(define (position e l s c)
+  (cond
+    [(empty? l) 0]
+    [(let ([h (car l)]
+           [t (cdr l)])
+       (if (equal? e h)
+         (if (zero? s) c (position e t (- s 1) (+ c 1)))
+         (position e t s (+ c 1))))]))
+
+(define (segment-match+ pattern input bindings)
+  (segment-match pattern input bindings 1))
+
+(define (segment-match? pattern input bindings)
+  (let ([var (second (first pattern))]
+        [pat (rest pattern)])
+    (or (pmatch (cons var pat) input bindings)
+        (pmatch pat input bindings))))
+
+(define (single-matcher pattern input bindings)
+  (apply (single-match-fn (car pattern)) (cdr pattern) input bindings))
+
+; succeed and bind var v if the input satisfies predicate p
+(define (match-is v/p input bindings)
+  (let* ([var (first v/p)]
+         [pred (second v/p)]
+         [new-binds (pmatch var input bindings)])
+    (if (or (eq? new-binds fail)
+            (not (apply pred input)))
+      fail
+      new-binds)))
+
+; succeed if all patterns match the input
+(define (match-and patterns input bindings)
+  (cond [(eq? bindings fail) fail]
+        [(null? patterns) bindings]
+        [else (match-and (cdr patterns)
+                          input
+                          (pmatch (car patterns) input bindings))]))
+
+; succed if at least one pattern matches the input
+(define (match-or patterns input bindings)
+  (if (null? bindings)
+    fail
+    (let ([new-binds (pmatch (car patterns) input bindings)])
+      (if (eq? new-binds fail)
+        (match-or (rest patterns) input bindings)
+        new-binds))))
+
+; Succeed if none of the patterns match the input
+(define (match-not patterns input bindings)
+  (if (match-or patterns input bindings) fail bindings))
+
+(define (match-if patterns input bindings)
+  #f)
 
 ; select random element from list l
 (define (random-elt l)
@@ -68,11 +150,18 @@
     [else tree]))
 
 ; symbol and list equality
+; (define (simple-equal? x y)
+;   (if (or (symbol? x) (symbol? y))
+;     (eq? x y)
+;     (and (simple-equal? (car x) (car y))
+;          (simple-equal? (cdr x) (cdr y)))))
 (define (simple-equal? x y)
-  (if (or (symbol? x) (symbol? y))
-    (eq? x y)
-    (and (simple-equal? (car x) (car y))
-         (simple-equal? (cdr x) (cdr y)))))
+  (cond
+    [(or (symbol? x) (symbol? y))
+    (eq? x y)]
+    [(and (cons? x) (cons? y)) (and (simple-equal? (car x) (car y))
+                                    (simple-equal? (cdr x) (cdr y)))]
+    [else #f]))
 
 (define fail empty)
 
@@ -128,3 +217,14 @@
              (pmatch (car pattern) (car input) bindings))]
     ; give up and just fail
     [else fail]))
+
+(define match-table
+  (make-hash
+    `(((?is  . single-match)  . ,match-is)
+      ((?or  . single-match)  . ,match-or)
+      ((?and . single-match)  . ,match-and)
+      ((?not . single-match)  . ,match-not)
+      ((?*   . segment-match) . ,segment-match)
+      ((?+   . segment-match) . ,segment-match+)
+      ((??   . segment-match) . ,segment-match?)
+      ((?if  . segment-match) . ,match-if))))

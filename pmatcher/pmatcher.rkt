@@ -52,3 +52,79 @@
 ; single-patterns are of the form '(?is x predicate), '(?and . patterns)
 (define (single-pattern? p)
   (and (cons? p) (single-match-fn (car p))))
+
+; select random element from list l
+(define (random-elt l)
+  (list-ref l (random (length l))))
+
+; perform substitutions in tree according to the association list
+(define (sublis al tree)
+  (cond
+    [(cons? tree)
+     (cons (sublis al (car tree)) (sublis al (cdr tree)))]
+    [(symbol? tree)
+     (let ([p (assoc tree al)])
+       (if p (cdr p) tree))]
+    [else tree]))
+
+; symbol and list equality
+(define (simple-equal? x y)
+  (if (or (symbol? x) (symbol? y))
+    (eq? x y)
+    (and (simple-equal? (car x) (car y))
+         (simple-equal? (cdr x) (cdr y)))))
+
+(define fail empty)
+
+(define no-bindings '((t . t)))
+
+; get pair with key var in the association list bindings
+(define (get-binding var bindings)
+  (assoc var bindings))
+
+; get value for the pair binding
+(define (binding-val binding)
+  (cdr binding))
+
+; add new key value pair to the association list
+(define (extend-bindings var val bindings)
+  `((,var . ,val) . ,(if (equal? bindings no-bindings) empty bindings)))
+
+; variables are of the form '?x, '?y etc
+(define (variable? x)
+  (and (symbol? x) (eq? (string-ref (symbol->string x) 0) #\?)))
+
+; segment-variables are of the form '(?* ?x), '(?* ?y) etc
+(define (segment-variable? x)
+  (and (list? x)
+       (equal? (length x) 2)
+       (equal? (symbol->string (car x)) "?*")
+       (symbol? (cadr x))
+       (variable? (cadr x))))
+
+; if matching binding already exsist for var, return bindings as it is. If it
+; doesn't exist extend binding to include it
+(define (match-variable var input bindings)
+  (let ([binding (get-binding var bindings)])
+    (cond [(not binding) (extend-bindings var input bindings)]
+          [(equal? input (binding-val binding)) bindings]
+          [else fail])))
+
+(define (pmatch pattern input [bindings no-bindings])
+  (cond
+    ; failure only occurs when bindings are empty
+    [(eq? bindings fail) fail]
+    ; no more elements to match, return current bindings
+    [(empty? pattern) bindings]
+    ; try to match using simple equality
+    [(simple-equal? pattern input) bindings]
+    [(variable? pattern) (match-variable pattern input bindings)]
+    [(segment-pattern? pattern) (segment-matcher pattern input bindings)]
+    [(single-pattern? pattern) (single-matcher pattern input bindings)]
+    ; recur if nothing works out
+    [(and (cons? pattern) (cons? input))
+     (pmatch (cdr pattern)
+             (cdr input)
+             (pmatch (car pattern) (car input) bindings))]
+    ; give up and just fail
+    [else fail]))

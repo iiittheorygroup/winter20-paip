@@ -14,6 +14,9 @@
          match-if
          pmatch)
 
+(define-namespace-anchor anc)
+(define ns (namespace-anchor->namespace anc))
+
 ; Grammar for the pattern matcher
 ; pat ::= var         (match any one expression)
 ;       | constant    (match just this atom)
@@ -135,7 +138,7 @@
 (define (match-if pattern input bindings)
   (and (eval
          `(let ,(map (lambda (x) (list (car x) (cdr x))) bindings)
-            ,(second (first pattern)))) ; SLICK!
+            ,(second (first pattern))) ns) ; SLICK!
        (pmatch (rest pattern) input bindings)))
 
 ; select random element from list l
@@ -231,5 +234,3 @@
       ((?+   . segment-match) . ,segment-match+)
       ((??   . segment-match) . ,segment-match?)
       ((?if  . segment-match) . ,match-if))))
-
-(let ((?z  7) (?y  4) (?op  +) (?x  3)) (simple-equal? (?op ?x ?y) ?z))

@@ -26,7 +26,7 @@
 (check-equal? (pmatch '(a (?* ?x) d) '(a b c d)) '((?x b c)))
 (check-equal? (pmatch '(a (?* ?x) (?* ?y) d) '(a b c d))'((?y b c) (?x)))
 (check-equal? (pmatch '(a (?* ?x) (?* ?y) ?x ?y) '(a b c d (b c) (d)))
-              '((?y d) ((?x) b c)))
+              '((?y d) (?x b c)))
 
 (check-equal? (pmatch '(?x ?op ?y is ?z (?if (equal? (?op ?x ?y) ?z)))
                       '(3 + 4 is 7))

@@ -1,6 +1,8 @@
 #lang racket
 
-(provide match-table)
+(provide match-table
+         segment-match-fn
+         single-match-fn)
 
 ; Grammar for the pattern matcher
 ; pat ::= var         (match any one expression)
@@ -24,11 +26,29 @@
 
 (define match-table
   (make-hash
-    '(((?is  single-match)  . match-is)
-      ((?or  single-match)  . match-or)
-      ((?and single-match)  . match-and)
-      ((?not single-match)  . match-not)
-      ((?*   segment-match) . segment-match)
-      ((?+   segment-match) . segment-match+)
-      ((??   segment-match) . segment-match?)
-      ((?if  segment-match) . match-if))))
+    '(((?is  . single-match)  . match-is)
+      ((?or  . single-match)  . match-or)
+      ((?and . single-match)  . match-and)
+      ((?not . single-match)  . match-not)
+      ((?*   . segment-match) . segment-match)
+      ((?+   . segment-match) . segment-match+)
+      ((??   . segment-match) . segment-match?)
+      ((?if  . segment-match) . match-if))))
+
+(define (segment-match-fn x)
+  (when (symbol? x) (hash-ref match-table (cons x 'segment-match))))
+
+(define (single-match-fn x)
+  (when (symbol? x) (hash-ref match-table (cons x 'single-match))))
+
+; segment-patterns are of the form '((?* ?x) hello there),
+; '((?* ?x) i feel happy)
+(define (segment-pattern? p)
+  (and (cons? p)
+       (cons? (car p))
+       (symbol? (caar p))
+       (segment-match-fn (caar p))))
+
+; single-patterns are of the form '(?is x predicate), '(?and . patterns)
+(define (single-pattern? p)
+  (and (cons? p) (single-match-fn (car p))))

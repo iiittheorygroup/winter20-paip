@@ -112,10 +112,10 @@
 (define (no-unknown e)
   (cond
     [(unknown? e) #f]
-    [(atom? e) #t]
+    [(and (not (expr? e)) (atom? e)) #t]
     [(no-unknown (expr-lhs e))
-     (no-unknown (expr-rhs expr))]
-    [else '()]))
+     (no-unknown (expr-rhs e))]
+    [else #f]))
 
 (define (one-unknown e)
   (cond
@@ -125,7 +125,7 @@
      (one-unknown (expr-rhs e))]
     [(no-unknown (expr-rhs e))
      (one-unknown (expr-lhs e))]
-    [else '()]))
+    [else #f]))
 
 (define (binary-expr? e)
   (and (expr? e)

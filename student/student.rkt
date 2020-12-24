@@ -7,7 +7,10 @@
          expr-lhs
          expr-rhs
          expr?
-         isolate)
+         isolate
+         no-unknown
+         one-unknown
+         prefix->infix)
 
 (define student-rules
   (make-hash
@@ -45,17 +48,7 @@
       (((?* ?x) % more than (?* ?y))  (* ?y (/ (+ 100 ?x) 100)))
       (((?* ?x) % (?* ?y)) (* (/ ?x 100) ?y)))))
 
-(define (expr op lhs rhs)
-  (list 'expr op lhs rhs))
-(define (expr-op e)
-  (second e))
-(define (expr-lhs e)
-  (third e))
-(define (expr-rhs e)
-  (fourth e))
-(define (expr? e)
-  (and (list? e)
-       (eq? (car e) 'expr)))
+(struct expr (op lhs rhs) #:transparent)
 
 (define (isolate e x)
   (cond
@@ -101,6 +94,9 @@
     (/ *)
     (= =)))
 
+(define binary-operators
+  '(+ - * / =))
+
 (define (inverse-op op)
   (second (assoc op operators-and-inverses)))
 
@@ -112,3 +108,38 @@
 
 (define (commutative? op)
   (member op '(+ * =)))
+
+(define (no-unknown e)
+  (cond
+    [(unknown? e) #f]
+    [(atom? e) #t]
+    [(no-unknown (expr-lhs e))
+     (no-unknown (expr-rhs expr))]
+    [else '()]))
+
+(define (one-unknown e)
+  (cond
+    [(unknown? e) e]
+    [(and (not (expr? e)) (atom? e)) #f]
+    [(no-unknown (expr-lhs e))
+     (one-unknown (expr-rhs e))]
+    [(no-unknown (expr-rhs e))
+     (one-unknown (expr-lhs e))]
+    [else '()]))
+
+(define (binary-expr? e)
+  (and (expr? e)
+       (member (expr-op e) binary-operators)))
+
+; slick!
+(define (prefix->infix e)
+  (if (binary-expr? e)
+    (map prefix->infix (list (expr-lhs e) (expr-op e) (expr-rhs e)))
+    e))
+
+; atom - any object that is not a cons
+(define (atom? a)
+  (not (cons? a)))
+
+(define (unknown? e)
+  (symbol? e))

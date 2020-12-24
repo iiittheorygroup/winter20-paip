@@ -24,3 +24,9 @@
 (check-equal? (isolate (expr '= (expr '* 4 'x) 2) 'x) (expr '= 'x (expr '/ 2 4)))
 ; Case 5
 (check-equal? (isolate (expr '= (expr '/ 4 'x) 2) 'x) (expr '= 'x (expr '/ 4 2)))
+
+(check-equal? (prefix->infix (expr '+ 1 2)) '(1 + 2))
+(check-equal? (prefix->infix (expr '+ (expr '- 4 1) 2)) '((4 - 1) + 2))
+
+(check-equal? (no-unknown (expr '+ 1 2)) #t)
+(check-equal? (one-unknown (expr '+ 'x 2)) 'x)

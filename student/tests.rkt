@@ -29,4 +29,16 @@
 (check-equal? (prefix->infix (expr '+ (expr '- 4 1) 2)) '((4 - 1) + 2))
 
 (check-equal? (no-unknown (expr '+ 1 2)) #t)
+(check-equal? (no-unknown (expr '- 1 2)) #t)
+(check-equal? (no-unknown (expr '/ 1 2)) #t)
+(check-equal? (no-unknown (expr '* 1 2)) #t)
+(check-equal? (no-unknown (expr '= 1 2)) #t)
+(check-equal? (no-unknown (expr '+ (expr '- 3 2) 2)) #t)
+(check-equal? (no-unknown (expr '+ 'x 2)) #f)
+(check-equal? (no-unknown (expr '+ 2 (expr '- 3 'x))) #f)
+
 (check-equal? (one-unknown (expr '+ 'x 2)) 'x)
+(check-equal? (one-unknown (expr '+ (expr '* 3 'x) 2)) 'x)
+(check-equal? (one-unknown (expr '+ 2 (expr '* 3 'x))) 'x)
+(check-equal? (one-unknown (expr '+ 1 2)) #f)
+(check-equal? (one-unknown (expr '- 1 2)) #f)

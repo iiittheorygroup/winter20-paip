@@ -50,6 +50,12 @@
 
 (struct expr (op lhs rhs) #:transparent)
 
+(define (expr->list e)
+  (cond
+    [(expr? e) (map expr->list (list (expr-op e) (expr-lhs e) (expr-rhs e)))]
+    [(atom? e) e]
+    [else (error "Bad expr: " e)]))
+
 (define (isolate e x)
   (cond
     ; Case 1 e : x = A => x = A
@@ -145,7 +151,7 @@
   (symbol? e))
 
 (define (solve-arithmetic eqn)
-  (expr '= (expr-lhs eqn) (expr-rhs eqn)))
+  (expr '= (expr-lhs eqn) (eval (expr->list (expr-rhs eqn)))))
 
 (define (solve-equations equations)
   (print-equations "The equations to be solved are:" equations)

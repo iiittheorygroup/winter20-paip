@@ -143,3 +143,41 @@
 
 (define (unknown? e)
   (symbol? e))
+
+(define (solve-arithmetic eqn)
+  (expr '= (expr-lhs eqn) (expr-rhs eqn)))
+
+(define (solve-equations equations)
+  (print-equations "The equations to be solved are:" equations)
+  (print-equations "The solution is:" (solve equations '())))
+
+(define (subst-answer var val e)
+  (cond
+    [(unknown? e)
+     (if (eq? var e)
+       val
+       e)]
+    [(expr? e)
+     (expr (expr-op e)
+           (subst-answer var val (expr-lhs e))
+           (subst-answer var val (expr-rhs e)))]
+    [(atom? e) e]
+    [else (error "Unknown subst: " e)]))
+
+(define (solve equations known)
+  (or (ormap (lambda (equation)
+               (let ([x (one-unknown equation)])
+                 (if x
+                   (let ([answer (solve-arithmetic (isolate equation x))])
+                     (solve (map ((curry subst-answer) (expr-lhs answer)
+                                                       (expr-rhs answer))
+                                 (remove equation equations))
+                            (cons answer known)))
+                   #f)))
+             equations)
+      known))
+
+(define (print-equations header equations)
+  (printf "\n~a\n~a\n"
+          header
+          (map prefix->infix equations)))

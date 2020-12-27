@@ -1,6 +1,7 @@
 #lang racket
 
 (require "../pmatch/pmatch.rkt")
+(require "../rule-based-translator/rule-based-translator.rkt")
 
 (provide expr
          expr-op
@@ -10,7 +11,8 @@
          isolate
          no-unknown
          one-unknown
-         prefix->infix)
+         prefix->infix
+         solve)
 
 (define student-rules
   (make-hash
@@ -47,6 +49,42 @@
       (((?* ?x) % less than (?* ?y))  (* ?y (/ (- 100 ?x) 100)))
       (((?* ?x) % more than (?* ?y))  (* ?y (/ (+ 100 ?x) 100)))
       (((?* ?x) % (?* ?y)) (* (/ ?x 100) ?y)))))
+
+(define rule-pattern first)
+(define rule-response second)
+
+(define (student words)
+  (solve-equations
+    (create-list-of-equations
+      (translate-to-expression (filter noise-word? words)))))
+
+(define (translate-to-expression words)
+  (or (rule-based-translator
+        words
+        student-rules
+        pmatch
+        rule-pattern
+        rule-response
+        (lambda (bindings response)
+          (sublis (map translate-pair bindings) response)))
+      (make-variable words)))
+
+(define (translate-pair pair)
+  (cons (car pair)
+        (translate-to-expression (cdr pair))))
+
+(define (create-list-of-equations exp)
+  (cond
+    [(empty? exp) empty]
+    [(atom? (first exp)) (list exp)]
+    [else (append (create-list-of-equations (first exp))
+                  (create-list-of-equations (rest exp)))]))
+
+(define (make-variable words)
+  (first words))
+
+(define (noise-word? word)
+  (member word '(a an the this number of $)))
 
 (struct expr (op lhs rhs) #:transparent)
 
@@ -151,7 +189,7 @@
   (symbol? e))
 
 (define (solve-arithmetic eqn)
-  (expr '= (expr-lhs eqn) (eval (expr->list (expr-rhs eqn)))))
+  (expr '= (expr-lhs eqn) (eval (expr->list (expr-rhs eqn)) (make-base-namespace))))
 
 (define (solve-equations equations)
   (print-equations "The equations to be solved are:" equations)

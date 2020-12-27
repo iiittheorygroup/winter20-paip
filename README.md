@@ -1,7 +1,7 @@
 # winter20-paip
 
-Materials used and code written for the winter 2020 summer school conducted on
-the book *Paradigms of Artificial Intelligence Programming* by Peter Norvig.
+Materials used and code written for the 2020 winter school conducted on the book
+*Paradigms of Artificial Intelligence Programming* by Peter Norvig.
 
 ## GPS
 
